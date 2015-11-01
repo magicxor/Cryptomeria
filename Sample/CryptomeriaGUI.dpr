@@ -1,14 +1,14 @@
 program CryptomeriaGUI;
 
 uses
-  Vcl.Forms,
+  Vcl.Forms, Spring.Container,
   uFormMain in 'uFormMain.pas' {FormMain},
   CryptorAES in '..\Source\CryptorAES.pas',
   CryptorRSA in '..\Source\CryptorRSA.pas',
   CryptoSetAES in '..\Source\CryptoSetAES.pas',
   CryptoSetRSA in '..\Source\CryptoSetRSA.pas',
   KeyPairGenerator in '..\Source\KeyPairGenerator.pas',
-  Logger in '..\Source\Logger.pas';
+  uRegistrations in 'uRegistrations.pas';
 
 {$R *.res}
 
@@ -18,6 +18,8 @@ begin
 {$ELSE}
   ReportMemoryLeaksOnShutdown := false;
 {$ENDIF}
+  RegisterTypes(GlobalContainer);
+
   Application.Initialize;
   Application.MainFormOnTaskbar := true;
   Application.CreateForm(TFormMain, FormMain);

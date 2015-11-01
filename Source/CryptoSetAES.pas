@@ -2,11 +2,11 @@ unit CryptoSetAES;
 
 interface
 
-uses TPLB3.CryptographicLibrary, TPLB3.Codec;
+uses TPLB3.CryptographicLibrary, TPLB3.Codec, {$INCLUDE LoggerImpl.inc};
 
 type
   ICryptoSetAES = interface
-    ['{437E3DD7-21EC-4674-8A7F-1699B8D08CCE}']
+    ['{63E985AA-07AB-4E76-A3DA-9CF18125DA3C}']
     function GetCodec: TCodec;
     property Codec: TCodec read GetCodec;
   end;
@@ -15,25 +15,28 @@ type
   private
     FCryptographicLibrary: TCryptographicLibrary;
     FCodec: TCodec;
+    FLogger: ILogger;
   public const
     DefaultKeySize = 256;
   public
     function GetCodec: TCodec;
     property Codec: TCodec read GetCodec;
 
-    constructor Create(AKeySize: integer = DefaultKeySize);
+    constructor Create(ALogger: ILogger; AKeySize: integer = DefaultKeySize);
     destructor Destroy; override;
   end;
 
 implementation
 
-uses System.SysUtils, TPLB3.Constants, TPLB3.Random, Logger;
+uses System.SysUtils, TPLB3.Constants, TPLB3.Random;
 
 { TCryptoSetAES }
 
-constructor TCryptoSetAES.Create(AKeySize: integer = DefaultKeySize);
+constructor TCryptoSetAES.Create(ALogger: ILogger; AKeySize: integer = DefaultKeySize);
 begin
   inherited Create;
+
+  FLogger := ALogger;
 
   TRandomStream.Instance.Randomize();
   FCryptographicLibrary := TCryptographicLibrary.Create(nil);
@@ -46,9 +49,11 @@ begin
       FCodec.ChainModeId := CBC_ProgId;
     except
       FreeAndNil(FCodec);
+      FLogger.Fatal('An error occurred during the interaction with FCodec');
     end;
   except
     FreeAndNil(FCryptographicLibrary);
+    FLogger.Fatal('An error occurred during the interaction with FCryptographicLibrary');
   end;
 end;
 
@@ -57,12 +62,12 @@ begin
   if FCodec <> nil then
     FreeAndNil(FCodec)
   else
-    TLogger.LogError('FCodec = nil');
+    FLogger.Error('FCodec = nil');
 
   if FCryptographicLibrary <> nil then
     FreeAndNil(FCryptographicLibrary)
   else
-    TLogger.LogError('FCryptographicLibrary = nil');
+    FLogger.Error('FCryptographicLibrary = nil');
 
   inherited;
 end;

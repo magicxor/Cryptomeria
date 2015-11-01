@@ -13,6 +13,7 @@ object FormMain: TFormMain
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBoxRSA: TGroupBox
@@ -24,7 +25,6 @@ object FormMain: TFormMain
     Align = alLeft
     Caption = 'RSA'
     TabOrder = 0
-    ExplicitHeight = 224
     object ButtonGenerateKeyPair: TButton
       AlignWithMargins = True
       Left = 5
@@ -68,7 +68,6 @@ object FormMain: TFormMain
     Align = alLeft
     Caption = 'AES'
     TabOrder = 1
-    ExplicitHeight = 224
     DesignSize = (
       191
       234)
@@ -83,7 +82,6 @@ object FormMain: TFormMain
       Caption = 'Decrypt'
       TabOrder = 0
       OnClick = ButtonDecryptAESClick
-      ExplicitTop = 182
     end
     object ButtonEncryptAES: TButton
       Left = 10
@@ -96,7 +94,6 @@ object FormMain: TFormMain
       Caption = 'Encrypt'
       TabOrder = 1
       OnClick = ButtonEncryptAESClick
-      ExplicitTop = 151
     end
     object LabeledEditCiphertext: TLabeledEdit
       Left = 10
@@ -111,7 +108,6 @@ object FormMain: TFormMain
       EditLabel.Height = 13
       EditLabel.Caption = 'Ciphertext'
       TabOrder = 2
-      ExplicitTop = 124
     end
     object LabeledEditPassword: TLabeledEdit
       Left = 10
@@ -126,7 +122,6 @@ object FormMain: TFormMain
       EditLabel.Height = 13
       EditLabel.Caption = 'Password'
       TabOrder = 3
-      ExplicitTop = 36
     end
     object LabeledEditPlaintext: TLabeledEdit
       Left = 10
@@ -141,7 +136,6 @@ object FormMain: TFormMain
       EditLabel.Height = 13
       EditLabel.Caption = 'Plaintext'
       TabOrder = 4
-      ExplicitTop = 80
     end
   end
 end

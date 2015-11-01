@@ -2,7 +2,7 @@ unit CryptoSetRSA;
 
 interface
 
-uses TPLB3.CryptographicLibrary, TPLB3.Codec, TPLB3.Signatory;
+uses TPLB3.CryptographicLibrary, TPLB3.Codec, TPLB3.Signatory, {$INCLUDE LoggerImpl.inc};
 
 type
   ICryptoSetRSA = interface
@@ -19,6 +19,7 @@ type
     FCryptographicLibrary: TCryptographicLibrary;
     FCodec: TCodec;
     FSignatory: TSignatory;
+    FLogger: ILogger;
   public const
     DefaultKeySize = 1024;
   public
@@ -28,19 +29,21 @@ type
     function GetSignatory: TSignatory;
     property Signatory: TSignatory read GetSignatory;
 
-    constructor Create(AKeySize: integer = DefaultKeySize);
+    constructor Create(ALogger: ILogger; AKeySize: integer = DefaultKeySize);
     destructor Destroy; override;
   end;
 
 implementation
 
-uses System.SysUtils, TPLB3.Constants, TPLB3.Random, Logger;
+uses System.SysUtils, TPLB3.Constants, TPLB3.Random;
 
 { TCryptoSetRSA }
 
-constructor TCryptoSetRSA.Create(AKeySize: integer = DefaultKeySize);
+constructor TCryptoSetRSA.Create(ALogger: ILogger; AKeySize: integer = DefaultKeySize);
 begin
   inherited Create;
+
+  FLogger := ALogger;
 
   TRandomStream.Instance.Randomize();
   FCryptographicLibrary := TCryptographicLibrary.Create(nil);
@@ -56,12 +59,15 @@ begin
         FSignatory.Codec := FCodec;
       except
         FreeAndNil(FSignatory);
+        FLogger.Fatal('An error occurred during the interaction with FSignatory');
       end;
     except
       FreeAndNil(FCodec);
+      FLogger.Fatal('An error occurred during the interaction with FCodec');
     end;
   except
     FreeAndNil(FCryptographicLibrary);
+    FLogger.Fatal('An error occurred during the interaction with FCryptographicLibrary');
   end;
 end;
 
@@ -70,17 +76,17 @@ begin
   if FSignatory <> nil then
     FreeAndNil(FSignatory)
   else
-    TLogger.LogError('FSignatory = nil');
+    FLogger.Error('FSignatory = nil');
 
   if FCodec <> nil then
     FreeAndNil(FCodec)
   else
-    TLogger.LogError('FCodec = nil');
+    FLogger.Error('FCodec = nil');
 
   if FCryptographicLibrary <> nil then
     FreeAndNil(FCryptographicLibrary)
   else
-    TLogger.LogError('FCryptographicLibrary = nil');
+    FLogger.Error('FCryptographicLibrary = nil');
 
   inherited;
 end;

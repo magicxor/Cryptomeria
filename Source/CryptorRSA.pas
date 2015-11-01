@@ -6,7 +6,7 @@ uses System.Classes, CryptoSetRSA;
 
 type
   ICryptorRSA = interface
-    ['{0FE654D9-954B-49B7-B372-DF43CB7A8131}']
+    ['{21B0C6BD-CBE8-4BE5-881B-737099CAC7F4}']
     procedure EncryptStream(APlaintextStream, ACiphertextStream, APublicKeyStream: TStream); overload;
     procedure EncryptStream(APlaintextStream, ACiphertextStream: TStream; const APublicKeyPath: string); overload;
 

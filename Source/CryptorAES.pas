@@ -6,7 +6,7 @@ uses System.Classes, CryptoSetAES;
 
 type
   ICryptorAES = interface
-    ['{0FE654D9-954B-49B7-B372-DF43CB7A8131}']
+    ['{13CB7544-CC4C-4A06-8FD8-C3952A844721}']
     procedure EncryptStream(APlaintextStream, ACiphertextStream: TStream; const APassword: string);
     procedure EncryptFile(const APlaintextFilePath, ACiphertextFilePath, APassword: string);
     procedure EncryptString(const APlaintextString: string; var ACiphertextString: string; const APassword: string);

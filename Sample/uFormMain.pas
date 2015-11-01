@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.WinXCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.WinXCtrls,
+  CryptorRSA, CryptorAES, KeyPairGenerator;
 
 type
   TFormMain = class(TForm)
@@ -23,7 +24,13 @@ type
     procedure ButtonDecryptFileRSAClick(Sender: TObject);
     procedure ButtonEncryptAESClick(Sender: TObject);
     procedure ButtonDecryptAESClick(Sender: TObject);
-  private const
+    procedure FormCreate(Sender: TObject);
+  private
+    FCryptorRSA: ICryptorRSA;
+    FCryptorAES: ICryptorAES;
+    FKeyPairGen: IKeyPairGenerator;
+
+  const
     C_ALL_FILES_FILTER = 'All files|*';
   public
     { Public declarations }
@@ -34,18 +41,22 @@ var
 
 implementation
 
-uses CryptoSetRSA, CryptorRSA, CryptoSetAES, CryptorAES, KeyPairGenerator,
-  Logger, TPLB3.Asymetric, System.Threading;
+uses System.Threading, Spring.Container;
 
 {$R *.dfm}
+
+procedure TFormMain.FormCreate(Sender: TObject);
+begin
+  FCryptorRSA := GlobalContainer.Resolve<ICryptorRSA>;
+  FCryptorAES := GlobalContainer.Resolve<ICryptorAES>;
+  FKeyPairGen := GlobalContainer.Resolve<IKeyPairGenerator>;
+end;
 
 procedure TFormMain.ButtonDecryptFileRSAClick(Sender: TObject);
 var
   OD: TOpenDialog;
   SD: TSaveDialog;
   Step1, Step2, Step3: boolean;
-  LCryptoSet: ICryptoSetRSA;
-  LCryptor: ICryptorRSA;
   PlantextFile, CiphertextFile, KeyFile: string;
 begin
   Step1 := false;
@@ -104,9 +115,7 @@ begin
 
       if Step3 then
       begin
-        LCryptoSet := TCryptoSetRSA.Create;
-        LCryptor := TCryptorRSA.Create(LCryptoSet);
-        LCryptor.DecryptFile(PlantextFile, CiphertextFile, KeyFile);
+        FCryptorRSA.DecryptFile(PlantextFile, CiphertextFile, KeyFile);
       end;
     end;
   end;
@@ -117,8 +126,6 @@ var
   OD: TOpenDialog;
   SD: TSaveDialog;
   Step1, Step2, Step3: boolean;
-  LCryptoSet: ICryptoSetRSA;
-  LCryptor: ICryptorRSA;
   PlantextFile, CiphertextFile, KeyFile: string;
 begin
   Step1 := false;
@@ -177,9 +184,7 @@ begin
 
       if Step3 then
       begin
-        LCryptoSet := TCryptoSetRSA.Create;
-        LCryptor := TCryptorRSA.Create(LCryptoSet);
-        LCryptor.EncryptFile(PlantextFile, CiphertextFile, KeyFile);
+        FCryptorRSA.EncryptFile(PlantextFile, CiphertextFile, KeyFile);
       end;
     end;
   end;
@@ -188,16 +193,14 @@ end;
 procedure TFormMain.ButtonGenerateKeyPairClick(Sender: TObject);
 var
   SD: TSaveDialog;
-  LKeyPairGenerator: IKeyPairGenerator;
-  FuturePairGenerator: IFuture<IKeyPairGenerator>;
+  FuturePairGenerator: IFuture<boolean>;
+  FutureCompleted: boolean;
 begin
-  FuturePairGenerator := TTask.Future<IKeyPairGenerator>(
-    function: IKeyPairGenerator
-    var
-      LCryptoSet: ICryptoSetRSA;
+  FuturePairGenerator := TTask.Future<boolean>(
+    function: boolean
     begin
-      LCryptoSet := TCryptoSetRSA.Create;
-      Result := TKeyPairGenerator.Create(LCryptoSet);
+      FKeyPairGen.GenerateNewKeyPair;
+      Result := true;
     end);
   FuturePairGenerator.Start;
 
@@ -207,10 +210,10 @@ begin
     if SD.Execute then
     begin
       Screen.Cursor := crHourGlass;
-      LKeyPairGenerator := FuturePairGenerator.Value;
-      LKeyPairGenerator.SavePairToFile(SD.FileName + '.lpr');
-      LKeyPairGenerator.SavePrivateKeyToFile(SD.FileName + '.lpv');
-      LKeyPairGenerator.SavePublicKeyToFile(SD.FileName + '.lpb');
+      FutureCompleted := FuturePairGenerator.Value; // <== wait for the future execution completed
+      FKeyPairGen.SavePairToFile(SD.FileName + '.lpr');
+      FKeyPairGen.SavePrivateKeyToFile(SD.FileName + '.lpv');
+      FKeyPairGen.SavePublicKeyToFile(SD.FileName + '.lpb');
     end;
   finally
     FreeAndNil(SD);
@@ -220,17 +223,13 @@ end;
 
 procedure TFormMain.ButtonEncryptAESClick(Sender: TObject);
 var
-  LCryptoSet: ICryptoSetAES;
-  LCryptor: ICryptorAES;
   Plaintext, Ciphertext, Password: string;
 begin
   Plaintext := LabeledEditPlaintext.Text;
   Ciphertext := LabeledEditCiphertext.Text;
   Password := LabeledEditPassword.Text;
 
-  LCryptoSet := TCryptoSetAES.Create;
-  LCryptor := TCryptorAES.Create(LCryptoSet);
-  LCryptor.EncryptString(Plaintext, Ciphertext, Password);
+  FCryptorAES.EncryptString(Plaintext, Ciphertext, Password);
 
   LabeledEditPlaintext.Text := Plaintext;
   LabeledEditCiphertext.Text := Ciphertext;
@@ -239,17 +238,13 @@ end;
 
 procedure TFormMain.ButtonDecryptAESClick(Sender: TObject);
 var
-  LCryptoSet: ICryptoSetAES;
-  LCryptor: ICryptorAES;
   Plaintext, Ciphertext, Password: string;
 begin
   Plaintext := LabeledEditPlaintext.Text;
   Ciphertext := LabeledEditCiphertext.Text;
   Password := LabeledEditPassword.Text;
 
-  LCryptoSet := TCryptoSetAES.Create;
-  LCryptor := TCryptorAES.Create(LCryptoSet);
-  LCryptor.DecryptString(Plaintext, Ciphertext, Password);
+  FCryptorAES.DecryptString(Plaintext, Ciphertext, Password);
 
   LabeledEditPlaintext.Text := Plaintext;
   LabeledEditCiphertext.Text := Ciphertext;

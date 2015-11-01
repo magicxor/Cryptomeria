@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>CryptomeriaGUI.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -77,6 +77,8 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>CryptomeriaGUI_Icon.ico</Icon_MainIcon>
@@ -103,14 +105,13 @@
         </DelphiCompile>
         <DCCReference Include="uFormMain.pas">
             <Form>FormMain</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Source\CryptorAES.pas"/>
         <DCCReference Include="..\Source\CryptorRSA.pas"/>
         <DCCReference Include="..\Source\CryptoSetAES.pas"/>
         <DCCReference Include="..\Source\CryptoSetRSA.pas"/>
         <DCCReference Include="..\Source\KeyPairGenerator.pas"/>
-        <DCCReference Include="..\Source\Logger.pas"/>
+        <DCCReference Include="uRegistrations.pas"/>
         <None Include="CryptomeriaGUI.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
