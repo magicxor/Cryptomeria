@@ -22,14 +22,6 @@ Cryptomeria is a thin wrapper library around TPLockBox, which enables you to enc
 
 - TurboPower LockBox 3.6.3 (http://lockbox.seanbdurkin.id.au/HomePage / https://github.com/SeanBDurkin/tplockbox)
 
-### Compilation guide
-
-In order to compile this sources on Windows, you need to install the Embarcadero RAD Studio 10 Seattle environment.
-
-### License
-
-This software is released under the GPLv3 license. See LICENSE.md.
-
 # CryptomeriaGUI
 Proof-of-concept GUI application based on Cryptomeria.
 
@@ -42,6 +34,10 @@ Proof-of-concept GUI application based on Cryptomeria.
 ### Screenshot
 ![Screenshot](https://habrastorage.org/files/d8d/e02/57b/d8de0257b494468a893af17675b4df50.png)
 
-### License
+# Compilation guide
+
+In order to compile this sources on Windows, you need to install the Embarcadero RAD Studio 10 Seattle environment.
+
+# License
 
 This software is released under the GPLv3 license. See LICENSE.md.
