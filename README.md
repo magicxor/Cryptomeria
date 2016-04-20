@@ -25,14 +25,14 @@ Cryptomeria is a thin wrapper library around TPLockBox, which enables you to enc
 # CryptomeriaGUI
 Proof-of-concept GUI application based on Cryptomeria.
 
+### Screenshot
+![Screenshot](https://habrastorage.org/files/d8d/e02/57b/d8de0257b494468a893af17675b4df50.png)
+
 ### Depedencies
 
 - TurboPower LockBox 3.6.3 (http://lockbox.seanbdurkin.id.au/HomePage / https://github.com/SeanBDurkin/tplockbox)
 - Cryptomeria
 - Spring4D 1.1.2 (https://bitbucket.org/sglienke/spring4d)
-
-### Screenshot
-![Screenshot](https://habrastorage.org/files/d8d/e02/57b/d8de0257b494468a893af17675b4df50.png)
 
 # Compilation guide
 
