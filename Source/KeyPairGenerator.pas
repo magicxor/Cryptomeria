@@ -2,7 +2,7 @@ unit KeyPairGenerator;
 
 interface
 
-uses System.Classes, TPLB3.Asymetric, CryptoSetRSA, {$INCLUDE LoggerImpl.inc};
+uses System.Classes, TPLB3.Asymetric, CryptoSetRSA;
 
 type
   IKeyPairGenerator = interface
@@ -19,7 +19,6 @@ type
   TKeyPairGenerator = class(TInterfacedObject, IKeyPairGenerator)
   private
     FCryptoSet: ICryptoSetRSA;
-    FLogger: ILogger;
     procedure SaveToFile(AFilePath: string; KeyStoragePartSet: TKeyStoragePartSet);
     procedure SaveToStream(var KeyStream: TStream; KeyStoragePartSet: TKeyStoragePartSet);
   public
@@ -30,7 +29,7 @@ type
     procedure SavePairToStream(var KeyStream: TStream);
     procedure SavePrivateKeyToStream(var KeyStream: TStream);
     procedure SavePublicKeyToStream(var KeyStream: TStream);
-    constructor Create(ALogger: ILogger; ACryptoSet: ICryptoSetRSA);
+    constructor Create(ACryptoSet: ICryptoSetRSA);
   end;
 
 implementation
@@ -39,11 +38,10 @@ uses TPLB3.CryptographicLibrary, TPLB3.Codec, TPLB3.Signatory, TPLB3.Constants, 
 
 { TKeyPairGenerator }
 
-constructor TKeyPairGenerator.Create(ALogger: ILogger; ACryptoSet: ICryptoSetRSA);
+constructor TKeyPairGenerator.Create(ACryptoSet: ICryptoSetRSA);
 begin
   inherited Create;
 
-  FLogger := ALogger;
   FCryptoSet := ACryptoSet;
 end;
 
@@ -54,12 +52,7 @@ begin
   FCryptoSet.Signatory.Burn;
   FCryptoSet.Codec.Burn;
 
-  if FCryptoSet.Signatory.GenerateKeys then
-    FLogger.Info('RSA keys successfully created.')
-  else if FCryptoSet.Signatory.Codec.isUserAborted then
-    FLogger.Warn('RSA keys generation aborted at user request.')
-  else
-    FLogger.Error('RSA keys generation failed.');
+  FCryptoSet.Signatory.GenerateKeys;
 end;
 
 procedure TKeyPairGenerator.SavePrivateKeyToStream(var KeyStream: TStream);

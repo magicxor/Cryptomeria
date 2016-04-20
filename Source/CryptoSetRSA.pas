@@ -2,7 +2,7 @@ unit CryptoSetRSA;
 
 interface
 
-uses TPLB3.CryptographicLibrary, TPLB3.Codec, TPLB3.Signatory, {$INCLUDE LoggerImpl.inc};
+uses TPLB3.CryptographicLibrary, TPLB3.Codec, TPLB3.Signatory;
 
 type
   ICryptoSetRSA = interface
@@ -19,7 +19,6 @@ type
     FCryptographicLibrary: TCryptographicLibrary;
     FCodec: TCodec;
     FSignatory: TSignatory;
-    FLogger: ILogger;
   public const
     DefaultKeySize = 1024;
   public
@@ -29,7 +28,7 @@ type
     function GetSignatory: TSignatory;
     property Signatory: TSignatory read GetSignatory;
 
-    constructor Create(ALogger: ILogger; AKeySize: integer = DefaultKeySize);
+    constructor Create(AKeySize: integer = DefaultKeySize);
     destructor Destroy; override;
   end;
 
@@ -39,11 +38,9 @@ uses System.SysUtils, TPLB3.Constants, TPLB3.Random;
 
 { TCryptoSetRSA }
 
-constructor TCryptoSetRSA.Create(ALogger: ILogger; AKeySize: integer = DefaultKeySize);
+constructor TCryptoSetRSA.Create(AKeySize: integer = DefaultKeySize);
 begin
   inherited Create;
-
-  FLogger := ALogger;
 
   TRandomStream.Instance.Randomize();
   FCryptographicLibrary := TCryptographicLibrary.Create(nil);
@@ -59,34 +56,25 @@ begin
         FSignatory.Codec := FCodec;
       except
         FreeAndNil(FSignatory);
-        FLogger.Fatal('An error occurred during the interaction with FSignatory');
       end;
     except
       FreeAndNil(FCodec);
-      FLogger.Fatal('An error occurred during the interaction with FCodec');
     end;
   except
     FreeAndNil(FCryptographicLibrary);
-    FLogger.Fatal('An error occurred during the interaction with FCryptographicLibrary');
   end;
 end;
 
 destructor TCryptoSetRSA.Destroy;
 begin
   if FSignatory <> nil then
-    FreeAndNil(FSignatory)
-  else
-    FLogger.Error('FSignatory = nil');
+    FreeAndNil(FSignatory);
 
   if FCodec <> nil then
-    FreeAndNil(FCodec)
-  else
-    FLogger.Error('FCodec = nil');
+    FreeAndNil(FCodec);
 
   if FCryptographicLibrary <> nil then
-    FreeAndNil(FCryptographicLibrary)
-  else
-    FLogger.Error('FCryptographicLibrary = nil');
+    FreeAndNil(FCryptographicLibrary);
 
   inherited;
 end;
